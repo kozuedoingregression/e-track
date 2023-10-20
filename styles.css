@@ -1,0 +1,22 @@
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.speedometer {
+    font-size: 48px;
+    margin: 50px;
+}
+
+.speed {
+    font-weight: bold;
+}
+
+.unit {
+    font-size: 24px;
+}
+
+button {
+    font-size: 18px;
+    padding: 10px 20px;
+}
