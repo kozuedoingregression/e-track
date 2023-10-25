@@ -3,6 +3,7 @@ let lastPosition;
 let speedDisplay = document.querySelector('.speed');
 let startButton = document.getElementById('startButton');
 let stopButton = document.getElementById('stopButton');
+let distanceDisplay = document.getElementById('distance');
 
 startButton.addEventListener('click', startSpeedometer);
 stopButton.addEventListener('click', stopSpeedometer);
@@ -37,6 +38,7 @@ function updateSpeed(position) {
         const timeDiff = (position.timestamp - lastPosition.timestamp) / 1000; // Convert to seconds
         const speed = (distance / timeDiff) * 3.6; // Convert m/s to km/h
         speedDisplay.textContent = speed.toFixed(2);
+        distanceDisplay.textContent = distance;
     }
     lastPosition = position;
 }
