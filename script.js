@@ -16,7 +16,7 @@ function calculateSpeedInKmPerHr(speedInMetersPerSec) {
 }
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    var R = 6371; // Earth radius in meters
+    var R = 6371; // Earth radius in kilometers
     var φ1 = lat1 * Math.PI / 180;
     var φ2 = lat2 * Math.PI / 180;
     var Δφ = (lat2 - lat1) * Math.PI / 180;
