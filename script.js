@@ -4,10 +4,10 @@
 //     if (!oldPosition || !timeDifference) {
 //         return 0;
 //     }
-    
+
 //     var distance = calculateDistance(newPosition.coords.latitude, newPosition.coords.longitude, 
 //                                      oldPosition.coords.latitude, oldPosition.coords.longitude);
-    
+
 //     return distance / timeDifference; // Speed in meters per second
 // }
 
@@ -61,21 +61,19 @@
 // }
 
 function getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(showPosition);
-    } else {
-      document.getElementById('speed').textContent = "Geolocation is not supported by this browser.";
-    }
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(showPosition);
+  } else {
+    document.getElementById('speed').textContent = "Geolocation is not supported by this browser.";
   }
-  function showPosition(position) {
-    if(position.coords.speed == null)
-    {
-        document.getElementById('speed').textContent = "null"
-    }else
-    {
-        document.getElementById('speed').textContent = position.coords.speed;
+}
+function showPosition(position) {
 
-    }
-  }
+  document.getElementById('distance').textContent = position.coords.longitude;
 
-getLocation()
+  document.getElementById('speed').textContent = position.coords.speed;
+
+
+}
+
+getLocation();
