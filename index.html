@@ -1,23 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Speed</title>
+    <title>Real-Time Speed Tracker</title>
 </head>
 <body>
     <h1>Speed: <span id="speed">0</span> km/h</h1>
+    <h2>Max Speed: <span id="maxSpeed">0</span> km/h</h2>
 
     <script>
+        let maxSpeed = 0; // Track the highest speed
+
         function toKmH(speed) {
             return (speed * 3.6).toFixed(2); // Convert m/s to km/h
         }
 
         function updateSpeed(position) {
             let speed = position.coords.speed; // Speed in m/s
-	    console.log(toKmH(speed));
             if (speed !== null) {
-                document.getElementById("speed").textContent = toKmH(speed);
+                let speedKmH = toKmH(speed);
+                document.getElementById("speed").textContent = speedKmH;
+                console.log(`Current Speed: ${speedKmH} km/h`);
+
+                // Update max speed if it's higher
+                if (speed > maxSpeed) {
+                    maxSpeed = speed;
+                    document.getElementById("maxSpeed").textContent = toKmH(maxSpeed);
+                }
             }
         }
 
