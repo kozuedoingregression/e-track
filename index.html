@@ -1,28 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>GPS Speedometer</title>
-    <meta charset="utf-8">
-	<meta name="viewport"
-		content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <meta name="description" content="how to track your speed and make a crew of friends to show records of speeds">
-    <meta
-    http-equiv="Content-Security-Policy"
-    content="default-src https://endurotrack.netlify.app/" />
-  
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Speed</title>
 </head>
 <body>
-    <div class="speedometer">
-        <div id="speed">0.00</div>
-        <div id="distance"></div>
-        <div class="unit">km/h</div>
-        <div class="distance"></div>
-    </div>
-    <button onclick="getLocation()">get speed</button>
-    <!-- <button id="startButton">Start</button>
-    <button id="stopButton">Stop</button> -->
-    <script src="script.js"></script>
+    <h1>Speed: <span id="speed">0</span> km/h</h1>
+
+    <script>
+        function toKmH(speed) {
+            return (speed * 3.6).toFixed(2); // Convert m/s to km/h
+        }
+
+        function updateSpeed(position) {
+            let speed = position.coords.speed; // Speed in m/s
+	    console.log(toKmH(speed));
+            if (speed !== null) {
+                document.getElementById("speed").textContent = toKmH(speed);
+            }
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(updateSpeed, console.error, {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 5000
+            });
+        } else {
+            alert("Geolocation is not supported by your browser.");
+        }
+    </script>
 </body>
 </html>
