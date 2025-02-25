@@ -1,76 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Enduro GT</title>
-        <style>
-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
-    margin: 0;
-}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enduro GT</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            margin: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+
         .nav-links {
             margin: 10px 0;
         }
+
         .nav-links a {
-            text-decoration: none; /* Removes underline */
-            color: black; /* Ensures the text color remains black */
-            margin: 0 15px; /* Adds spacing between links */
+            text-decoration: none;
+            color: black;
+            margin: 0 15px;
             font-size: 18px;
             font-weight: bold;
+            transition: color 0.3s;
         }
+
         .footer {
             text-align: center;
             padding: 10px;
             border-top: 2px solid black;
             width: 100%;
-            position: absolute;
+            position: fixed;
             bottom: 0;
-        }
-        @media screen and (orientation: portrait) {
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                height: 100vh;
-                background-color: black; /* Optional: Change background to indicate the wrong orientation */
-                color: white;
-            }
-
-            .dashboard {
-                display: none; /* Hide the dashboard in portrait mode */
-            }
-
-            .rotate-message {
-                display: block;
-                font-size: 20px;
-                font-weight: bold;
-            }
+            background: white;
+            transition: background 0.3s;
         }
 
-        @media screen and (orientation: landscape) {
-            .rotate-message {
-                display: none; /* Hide message in landscape */
-            }
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background: black;
+            color: white;
         }
-        </style>
-    </head>
-    <body>
-        <p class="rotate-message">Please rotate your device to landscape mode.</p>
-        <h1>Enduro GT</h1>
-        <div class="nav-links">
-            <a href="telemetry.html">Telemetry</a>
-            <a href="crew.html">Crew</a>
-            <a href="profile.html">Profile</a>
-        </div>
-    </body>
-    <footer class="footer">
-        <p>© 2025 Enduro GT. All rights reserved.</p>
-    </footer>
+
+        body.dark-mode .nav-links a {
+            color: white;
+        }
+
+        body.dark-mode .footer {
+            background: black;
+            border-top: 2px solid white;
+        }
+
+        .toggle-button {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            background: black;
+            color: white;
+            margin-top: 10px;
+            border-radius: 5px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark-mode .toggle-button {
+            background: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enduro GT</h1>
+    
+    <div class="nav-links">
+        <a href="telemetry.html">Telemetry</a>
+        <a href="crew.html">Crew</a>
+        <a href="profile.html">Profile</a>
+    </div>
+
+    <!-- Dark Mode Toggle Button -->
+    <button class="toggle-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+    <!-- Include dark mode script -->
+    <script src="js/darkmode.js"></script>
+</body>
+<footer class="footer">
+    <p>© 2025 Enduro GT. All rights reserved.</p>
+</footer>
 </html>

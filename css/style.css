@@ -7,6 +7,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    transition: background 0.3s, color 0.3s;
 }
 .dashboard {
     display: grid;
@@ -74,4 +75,38 @@ li {
     border: 1px solid black;
     padding: 5px;
     text-align: center;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background: black;
+    color: white;
+}
+
+body.dark-mode .footer {
+    background: black;
+    border-top: 2px solid white;
+}
+
+.toggle-button {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    background: black;
+    color: white;
+    margin-top: 10px;
+    border-radius: 5px;
+    transition: background 0.3s, color 0.3s;
+}
+
+body.dark-mode .toggle-button {
+    background: white;
+    color: black;
+}
+.dark-mode fieldset {
+    border: 2px solid white;
+    background: black;
+    color: white;
 }
