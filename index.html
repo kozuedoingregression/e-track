@@ -1,46 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Speed Tracker</title>
+    <title>Enduro GT</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            margin: 0;
+        }
+        .nav-links {
+            margin: 10px 0;
+        }
+        .nav-links a {
+            text-decoration: none; /* Removes underline */
+            color: black; /* Ensures the text color remains black */
+            margin: 0 15px; /* Adds spacing between links */
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            border-top: 2px solid black;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Speed: <span id="speed">0</span> km/h</h1>
-    <h2>Max Speed: <span id="maxSpeed">0</span> km/h</h2>
-
-    <script>
-        let maxSpeed = 0; // Track the highest speed
-
-        function toKmH(speed) {
-            return (speed * 3.6).toFixed(2); // Convert m/s to km/h
-        }
-
-        function updateSpeed(position) {
-            let speed = position.coords.speed; // Speed in m/s
-            if (speed !== null) {
-                let speedKmH = toKmH(speed);
-                document.getElementById("speed").textContent = speedKmH;
-                console.log(`Current Speed: ${speedKmH} km/h`);
-
-                // Update max speed if it's higher
-                if (speed > maxSpeed) {
-                    maxSpeed = speed;
-                    document.getElementById("maxSpeed").textContent = toKmH(maxSpeed);
-                }
-            }
-        }
-
-        if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(updateSpeed, console.error, {
-                enableHighAccuracy: true,
-                maximumAge: 0,
-                timeout: 5000
-            });
-        } else {
-            alert("Geolocation is not supported by your browser.");
-        }
-    </script>
+    <h1>Enduro GT</h1>
+    <div class="nav-links">
+        <a href="telemetry.html">Telemetry</a>
+        <a href="crew.html">Crew</a>
+        <a href="profile.html">Profile</a>
+    </div>
 </body>
+<footer class="footer">
+    <p>© 2025 Enduro GT. All rights reserved.</p>
+</footer>
 </html>
