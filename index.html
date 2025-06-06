@@ -1,95 +1,520 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enduro GT</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-            margin: 0;
-            transition: background 0.3s, color 0.3s;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>EnduroGT | Tuner</title>
+        <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --primary-color: #f0f0f0; /* Light gray for main text */
+                --secondary-color: #a0a0a0; /* Darker gray for labels/units */
+                --accent-color: #ffcc00; /* Orange/yellow for highlights */
+                --background-color: #0a0a0a; /* Deep dark background */
+                --display-bg: #2a2a2a; /* Slightly lighter dark for display areas */
+                 --scale-color: rgba(255, 255, 255, 0.1); /* Very subtle scale lines */
+                 --scale-major-color: rgba(255, 255, 255, 0.3); /* Slightly more visible major lines */
+            }
 
-        .nav-links {
-            margin: 10px 0;
-        }
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: 'Rajdhani', sans-serif;
+                background-color: var(--background-color);
+                color: var(--primary-color);
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden; /* Prevent scrollbars from radial gradient */
+            }
 
-        .nav-links a {
-            text-decoration: none;
-            color: black;
-            margin: 0 15px;
-            font-size: 18px;
-            font-weight: bold;
-            transition: color 0.3s;
-        }
+            .tuner-cluster {
+                background-color: var(--background-color);
+                border-radius: 20px;
+                padding: 40px 30px;
+                box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+                width: 95%;
+                max-width: 500px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+                overflow: hidden; /* Hide parts of the scale */
+            }
 
-        .footer {
-            text-align: center;
-            padding: 10px;
-            border-top: 2px solid black;
-            width: 100%;
-            position: fixed;
-            bottom: 0;
-            background: white;
-            transition: background 0.3s;
-        }
+             /* Circular scale container */
+            .circular-scale {
+                position: absolute;
+                bottom: -250px; /* Position the center below the cluster */
+                left: 50%;
+                transform: translateX(-50%);
+                width: 600px; /* Large size */
+                height: 600px;
+                border-radius: 50%;
+                /* border: 1px solid rgba(255, 255, 255, 0.1); Subtle border */
+                /* background-color: rgba(255,255,255,0.05); Optional subtle fill */
+                pointer-events: none; /* Allow clicks to pass through */
+                z-index: 0; /* Behind other content */
+                 /* Transform origin at the center */
+                transform-origin: 50% 50%;
+            }
 
-        /* Dark Mode Styles */
-        body.dark-mode {
-            background: black;
-            color: white;
-        }
+             /* Scale markings */
+            .scale-marking {
+                 position: absolute;
+                 bottom: 50%; /* Position at the center bottom of the circle */
+                 left: 50%;
+                 width: 2px;
+                 height: 20px; /* Length of the markings */
+                 background-color: var(--scale-color);
+                 transform-origin: bottom center;
+             }
 
-        body.dark-mode .nav-links a {
-            color: white;
-        }
+            .scale-marking.major {
+                 height: 30px;
+                 background-color: var(--scale-major-color);
+             }
 
-        body.dark-mode .footer {
-            background: black;
-            border-top: 2px solid white;
-        }
+            .scale-number {
+                 position: absolute;
+                 bottom: 50%; /* Position at the center bottom of the circle */
+                 left: 50%;
+                 font-size: 1rem;
+                 color: var(--secondary-color);
+                 /* transform-origin will be set by JS */
+                 pointer-events: none;
+            }
 
-        .toggle-button {
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            background: black;
-            color: white;
-            margin-top: 10px;
-            border-radius: 5px;
-            transition: background 0.3s, color 0.3s;
-        }
+            .indicator {
+                 position: absolute;
+                 bottom: 50%; /* Position at the center bottom of the circle */
+                 left: 50%;
+                 width: 4px;
+                 height: 280px; /* Length of the indicator, slightly less than radius */
+                 background: linear-gradient(to top, var(--accent-color) 0%, transparent 70%);
+                 transform-origin: bottom center;
+                 z-index: 2;
+                 pointer-events: none;
+                 transition: transform 0.2s ease-out; /* Smooth movement */
+             }
 
-        body.dark-mode .toggle-button {
-            background: white;
-            color: black;
-        }
-    </style>
-</head>
-<body>
-    <h1>Enduro GT</h1>
-    
-    <div class="nav-links">
-        <a href="telemetry.html">Telemetry</a>
-        <a href="crew.html">Crew</a>
-        <a href="profile.html">Profile</a>
-    </div>
+            .top-info {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                margin-bottom: 30px;
+                font-size: 0.9rem;
+                color: var(--secondary-color);
+                position: relative; /* Ensure it's above the scale */
+                z-index: 1;
+            }
 
-    <!-- Dark Mode Toggle Button -->
-    <button class="toggle-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+            .main-display {
+                background-color: var(--display-bg);
+                border-radius: 15px; /* Match the rounded corners in the image */
+                padding: 20px 40px;
+                margin-bottom: 30px; /* Increase spacing */
+                display: flex;
+                align-items: baseline;
+                 position: relative; /* Ensure it's above the scale */
+                z-index: 1;
+                 overflow: hidden; /* Hide glowing text overflow */
+            }
 
-    <!-- Include dark mode script -->
-    <script src="js/darkmode.js"></script>
-</body>
-<footer class="footer">
-    <p>© 2025 Enduro GT. All rights reserved.</p>
-</footer>
+            .main-value {
+                font-size: 6rem;
+                font-weight: 700;
+                color: var(--primary-color);
+                line-height: 1;
+                 /* Remove afterburner text shadow */
+            }
+
+            .main-unit {
+                font-size: 1.5rem;
+                color: var(--secondary-color);
+                margin-left: 10px;
+            }
+
+            .bottom-metrics {
+                display: flex;
+                justify-content: space-around;
+                width: 100%;
+                margin-top: 20px;
+                font-size: 1.2rem;
+                 position: relative; /* Ensure it's above the scale */
+                z-index: 1;
+            }
+
+            .metric-display {
+                text-align: center;
+                color: var(--secondary-color);
+            }
+
+            .metric-value {
+                 font-size: 1.5rem;
+                 font-weight: 500;
+                 color: var(--primary-color);
+                 margin-bottom: 5px;
+                 /* Remove afterburner text shadow */
+            }
+
+            .metric-unit {
+                font-size: 0.8em;
+                color: var(--secondary-color);
+                margin-left: 5px;
+            }
+
+            .metric-label {
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                opacity: 0.8;
+            }
+
+            .controls {
+                position: absolute;
+                bottom: 20px;
+                right: 30px;
+                display: flex;
+                gap: 10px;
+                 position: relative; /* Ensure it's above the scale */
+                z-index: 1;
+            }
+
+             .theme-toggle,
+             .unit-toggle {
+                 width: 40px;
+                 height: 40px;
+                 border-radius: 50%;
+                 border: none;
+                 background: var(--display-bg);
+                 cursor: pointer;
+                 transition: background 0.3s ease;
+                 display: flex;
+                 align-items: center;
+                 justify-content: center;
+                 padding: 0;
+                 color: var(--primary-color);
+             }
+
+             .unit-toggle {
+                 width: auto;
+                 padding: 0 15px;
+                 border-radius: 20px;
+                 font-size: 0.9rem;
+                 font-weight: 600;
+                 color: var(--accent-color);
+                 background: var(--display-bg);
+             }
+
+             .unit-toggle:hover, .theme-toggle:hover {
+                 background: #3a3a3a;
+             }
+
+            /* Subtle background animation */
+            body::before {
+                content: '';
+                position: fixed;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.05) 10%, transparent 10%);
+                background-size: 20px 20px;
+                animation: move-bg 60s linear infinite;
+                z-index: -1;
+            }
+
+            @keyframes move-bg {
+                0% { transform: translate(0, 0); }
+                100% { transform: translate(50%, 50%); }
+            }
+
+            /* Simple value change animation */
+            .main-value, .metric-value {
+                 transition: transform 0.2s ease-out;
+            }
+
+             /* Light theme styles - adapted for new colors */
+            [data-theme="light"] {
+                --primary-color: #333333;
+                --secondary-color: #666666;
+                --accent-color: #cc5500; /* Darker orange for light theme */
+                --background-color: #f5f5f5;
+                --display-bg: #e0e0e0;
+                 --scale-color: rgba(0, 0, 0, 0.1);
+                 --scale-major-color: rgba(0, 0, 0, 0.3);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="tuner-cluster">
+             <div class="circular-scale">
+                 <div class="indicator" id="speedIndicator"></div>
+             </div>
+
+            <div class="top-info">
+                <span class="channel-info">Telemetry Data</span>
+                <span class="time-info" id="currentTime">--:--</span> <!-- Placeholder for time if needed -->
+            </div>
+
+            <div class="main-display">
+                <span class="main-value" id="speed">0</span>
+                <span class="main-unit" id="speedUnit">km/h</span>
+            </div>
+            
+            <div class="bottom-metrics">
+                <div class="metric-display">
+                     <div class="metric-value">
+                         <span id="topSpeed">0</span>
+                         <span class="metric-unit" id="topSpeedUnit">km/h</span>
+                    </div>
+                    <div class="metric-label">MAX VELOCITY</div>
+                </div>
+
+                <div class="metric-display">
+                    <div class="metric-value">
+                         <span id="distance">0.0</span>
+                         <span class="metric-unit" id="distanceUnit">km</span>
+                    </div>
+                    <div class="metric-label">RANGE</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+             <button onclick="toggleDarkMode()" class="theme-toggle" aria-label="Toggle theme"></button>
+             <button onclick="toggleUnits()" class="unit-toggle" aria-label="Toggle units">
+                 <span class="unit-indicator">KM/H</span>
+             </button>
+         </div>
+
+        <script>
+            let wakeLock = null;
+            let topSpeed = 0;
+            let totalDistance = 0;
+            let lastPosition = null;
+            let isMetric = true;
+
+             // Generate scale markings and numbers
+            function generateScale() {
+                 const scale = document.querySelector('.circular-scale');
+                 const numMarkings = 100; // Adjust number of markings for smoother scale
+                 const startAngle = -135; // Starting angle for the scale (bottom left)
+                 const endAngle = 135; // Ending angle for the scale (bottom right)
+                 const angleRange = endAngle - startAngle;
+                 
+                 const numbersToShowMetric = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200];
+                 const numbersToShowImperial = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120];
+                 const numbersToShow = isMetric ? numbersToShowMetric : numbersToShowImperial;
+                 
+                 const maxSpeed = isMetric ? 200 : 120; // Assume a max speed for the scale
+                 const scaleRadius = 300; // Half of the circular-scale width/height
+
+                 scale.innerHTML = ''; // Clear previous markings and numbers
+                 scale.innerHTML = '<div class="indicator" id="speedIndicator"></div>'; // Add indicator back
+
+                 for (let i = 0; i <= numMarkings; i++) {
+                     const marking = document.createElement('div');
+                     marking.classList.add('scale-marking');
+                     
+                     // Determine if it's a major marking
+                     const speedValueForMarking = (i / numMarkings) * maxSpeed;
+                     let isMajor = false;
+                     for(let j = 0; j < numbersToShow.length; j++){
+                         // Check if the marking's speed value is close to a number to show
+                         if (Math.abs(speedValueForMarking - numbersToShow[j]) < (maxSpeed / numMarkings) * 2) { // Tolerance
+                             isMajor = true;
+                             break;
+                         }
+                     }
+
+                     if (isMajor) {
+                          marking.classList.add('major');
+                      }
+
+                     const angle = startAngle + (i / numMarkings) * angleRange;
+                      // Adjust translate Y based on the scale container size and desired position of markings
+                     const translateY = -scaleRadius; 
+                     marking.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translateY(${translateY}px)`;
+                     scale.appendChild(marking);
+                 }
+                 
+                 // Add numbers to the scale
+                 numbersToShow.forEach(number => {
+                     const numberElement = document.createElement('div');
+                     numberElement.classList.add('scale-number');
+                     numberElement.textContent = number;
+                      const angle = startAngle + (number / maxSpeed) * angleRange;
+                      const translateY = -(scaleRadius - 30); // Position numbers slightly inside the markings
+                     numberElement.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translateY(${translateY}px) rotate(${-angle}deg)`; // Rotate back the number text
+                     scale.appendChild(numberElement);
+                 });
+             }
+
+            function toggleUnits() {
+                isMetric = !isMetric;
+                const unitIndicator = document.querySelector('.unit-indicator');
+                const speedUnit = document.getElementById('speedUnit');
+                const topSpeedUnit = document.getElementById('topSpeedUnit');
+                const distanceUnit = document.getElementById('distanceUnit');
+                
+                if (isMetric) {
+                    unitIndicator.textContent = 'KM/H';
+                    speedUnit.textContent = 'km/h';
+                    topSpeedUnit.textContent = 'km/h';
+                    distanceUnit.textContent = 'km';
+                } else {
+                    unitIndicator.textContent = 'MPH';
+                    speedUnit.textContent = 'mph';
+                    topSpeedUnit.textContent = 'mph';
+                    distanceUnit.textContent = 'mi';
+                }
+                
+                // Re-generate scale and update current values
+                generateScale();
+                updateDisplayedValues();
+            }
+
+            function updateDisplayedValues() {
+                const speedElement = document.getElementById('speed');
+                const topSpeedElement = document.getElementById('topSpeed');
+                const distanceElement = document.getElementById('distance');
+                const speedIndicator = document.getElementById('speedIndicator');
+                
+                if (lastPosition) {
+                    const currentSpeed = lastPosition.coords.speed;
+                    if (currentSpeed !== null) {
+                        speedElement.textContent = convertSpeed(currentSpeed);
+                         // Update indicator rotation based on speed
+                        const maxSpeed = isMetric ? 200 : 120; // Assume a max speed for scale mapping
+                        const angleRange = 270; // Total degrees for the scale (e.g., -135 to 135)
+                        const startAngle = -135;
+                        const speedValue = isMetric ? currentSpeed * 3.6 : currentSpeed * 3.6 * 0.621371; // Use appropriate unit for mapping
+                        const speedPercentage = Math.min(speedValue, maxSpeed) / maxSpeed; 
+                        const rotationAngle = startAngle + speedPercentage * angleRange;
+                        speedIndicator.style.transform = `translate(-50%, -50%) rotate(${rotationAngle}deg)`;
+
+                    } else {
+                         speedElement.textContent = convertSpeed(0); // Display 0 if speed is null
+                         speedIndicator.style.transform = `translate(-50%, -50%) rotate(${-135}deg)`; // Reset indicator
+                    }
+                    topSpeedElement.textContent = convertSpeed(topSpeed);
+                    distanceElement.textContent = convertDistance(totalDistance);
+                } else {
+                     // Initial display before first position update
+                     speedElement.textContent = convertSpeed(0);
+                     topSpeedElement.textContent = convertSpeed(0);
+                     distanceElement.textContent = convertDistance(0);
+                      speedIndicator.style.transform = `translate(-50%, -50%) rotate(${-135}deg)`; // Initial indicator position
+                }
+            }
+
+            function convertSpeed(speed) {
+                // Convert m/s to km/h or mph
+                if (speed === null) return isMetric ? '0' : '0'; // Handle null speed gracefully
+                const kmh = speed * 3.6;
+                return isMetric ? kmh.toFixed(0) : (kmh * 0.621371).toFixed(0);
+            }
+
+            function convertDistance(distance) {
+                // Convert km to miles if needed
+                return isMetric ? distance.toFixed(1) : (distance * 0.621371).toFixed(1);
+            }
+
+            async function requestWakeLock() {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    wakeLock.addEventListener('release', () => {
+                        console.log('Wake Lock was released');
+                        requestWakeLock();
+                    });
+                    console.log('Wake Lock is active');
+                } catch (err) {
+                    console.error(`Wake Lock error: ${err.message}`);
+                }
+            }
+
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === "visible") {
+                    requestWakeLock();
+                }
+            });
+
+            document.addEventListener("DOMContentLoaded", () => {
+                requestWakeLock();
+                generateScale(); // Generate scale on load
+                updateDisplayedValues(); // Display initial values and position indicator
+                 // Optional: Update time regularly if you add a time display
+                // setInterval(updateTime, 1000);
+            });
+
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // Earth's radius in km
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                         Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                         Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                return R * c;
+            }
+
+            function updateMetrics(position) {
+                let speed = position.coords.speed;
+                
+                if (speed !== null) {
+                     // Only update speed if it's a valid number
+                    document.getElementById("speed").textContent = convertSpeed(speed);
+
+                    if (speed > topSpeed) {
+                        topSpeed = speed;
+                        document.getElementById("topSpeed").textContent = convertSpeed(topSpeed);
+                    }
+                } else {
+                     // If speed is null (e.g., no GPS signal), display the last known speed or 0
+                     document.getElementById("speed").textContent = convertSpeed(lastPosition ? lastPosition.coords.speed : 0);
+                }
+
+                if (lastPosition) {
+                    const distance = calculateDistance(
+                        lastPosition.coords.latitude,
+                        lastPosition.coords.longitude,
+                        position.coords.latitude,
+                        position.coords.longitude
+                    );
+                    totalDistance += distance;
+                    document.getElementById("distance").textContent = convertDistance(totalDistance);
+                }
+                lastPosition = position;
+                 updateDisplayedValues(); // Update all displayed values and indicator
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(updateMetrics, console.error, {
+                    enableHighAccuracy: true,
+                    maximumAge: 1000, // Use a small maximumAge to get more frequent updates
+                    timeout: 5000 // Increase timeout in case of slow GPS fix
+                });
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+
+            // Dark mode toggle
+            function toggleDarkMode() {
+                const htmlElement = document.documentElement;
+                if (htmlElement.getAttribute('data-theme') === 'light') {
+                    htmlElement.setAttribute('data-theme', 'dark');
+                } else {
+                    htmlElement.setAttribute('data-theme', 'light');
+                }
+            }
+
+            // Set initial theme (optional, defaults to dark if no data-theme attribute)
+            // document.documentElement.setAttribute('data-theme', 'dark');
+
+        </script>
+    </body>
 </html>
+
